@@ -1,0 +1,734 @@
+#include <iostream>
+#include <conio.h>
+#include <iomanip>
+#include <string>
+#include <fstream>
+using namespace std;
+
+struct node {
+
+	int ID, quantity;
+	double unitCost;
+	string name;
+	struct node* next;
+
+}*start;
+
+struct customerNode {
+
+	int transNo;
+	string name_;
+	double bill;
+	struct customerNode* fwd;
+
+}*top;
+
+void insertItem() {
+
+	int id, quant;
+	double ucost;
+	string nme;
+	if (start == NULL)
+	{
+		node* temp;
+		temp = new node();
+		cout << "\nEnter Product ID (Note: Unchangeable after entry so input carefully): "; cin >> id;
+		cin.ignore();
+		cout << "\nEnter Product Name: ";
+		getline(cin, nme);
+		cout << "\nEnter Product Quantity: "; cin >> quant;
+		cout << "\nEnter Product Unit Price (in PKR): "; cin >> ucost;
+
+		temp->ID = id;
+		temp->quantity = quant;
+		temp->unitCost = ucost;
+		temp->name.assign(nme);
+		temp->next = NULL;
+		start = temp;
+		cout << "\n--------------------------------------------\n";
+	}
+	else
+	{
+		cout << "\nEnter Product ID (Note: Unchangeable after entry so input carefully): "; cin >> id;
+		cin.ignore();
+		cout << "\nEnter Product Name: ";
+		getline(cin, nme);
+		cout << "\nEnter Product Quantity: ";  cin >> quant;
+		cout << "\nEnter Product Unit Price (in PKR): "; cin >> ucost;
+		node* ptr, * tempnode;
+		ptr = start;
+		while (1)
+		{
+			if (ptr->next != NULL)
+				ptr = ptr->next;
+			else
+				break;
+		}
+		tempnode = new node();
+		tempnode->ID = id;
+		tempnode->quantity = quant;
+		tempnode->unitCost = ucost;
+		tempnode->name.assign(nme);
+		tempnode->next = NULL;
+		ptr->next = tempnode;
+		cout << "\n--------------------------------------------\n";
+	}
+}
+
+
+void updateItem(int iD) {
+
+	double cost;
+	int count = 0, check = 0, quan;
+	string newName;
+	node* ptr = start;
+	while (ptr != NULL)
+	{
+		if (iD == ptr->ID) {
+			count++;
+			check = 0;
+			cout << "\nProduct ID # " << iD << " along with name '" << ptr->name << "' is located at " << ptr << " address in memory and occupies '" << count << "' position in the linked list.\n";
+			cout << "Set new product name as: ";
+			getline(cin, newName);
+			ptr->name.assign(newName);
+			cout << "\nPrevious product quantity: " << ptr->quantity << endl;
+			cout << "Set new quantity to be: "; cin >> quan;
+			ptr->quantity = quan;
+			cout << "\nPrevious product unit price (in PKR): " << ptr->unitCost << endl;
+			cout << "Set new unit price (in PKR) to be: "; cin >> cost;
+			ptr->unitCost = cost;
+			cout << endl;
+			break;
+		}
+		else {
+			check = 1;
+			count++;
+		}
+		ptr = ptr->next;
+	}
+
+	if (check == 1) {
+
+		cout << "\nNo such product with ID # " << iD << " present in the inventory.\n";
+
+	}
+
+
+	cout << endl;
+	system("pause");
+
+}
+
+void deleteItem() {
+
+	int count = 1;
+	if (start == NULL)
+	{
+		cout << "\nThe inventory is empty.\n\n";
+		system("pause");
+
+		return;
+	}
+
+	node* temp1 = start;
+	while (temp1 != NULL)
+	{
+
+		if (count == 1 && temp1->quantity == 0)
+		{
+			cout << "\nProduct ID # " << temp1->ID << " is located at " << temp1 << " address in memory and occupies '" << count << "' position in the linked list.\n";
+			cout << "Deleting product record entirely as it is out of stock.\n";
+			temp1 = start;
+			start = start->next;
+			delete temp1;
+
+			cout << endl;
+			system("pause");
+
+			return;
+		}
+
+		else if (temp1->quantity == 0 && count > 1 && temp1->next == NULL)
+		{
+			node* previous = new node;
+			temp1 = start;
+			while (temp1->next != NULL)
+			{
+				previous = temp1;
+				temp1 = temp1->next;
+			}
+			cout << "\nProduct ID # " << temp1->ID << " is located at " << temp1 << " address in memory and occupies '" << count << "' position in the linked list.\n";
+			cout << "Deleting product record entirely as it is out of stock.\n";
+			previous->next = NULL;
+			delete temp1;
+			system("pause");
+
+			return;
+		}
+
+		else if (temp1->quantity == 0 && count > 1 && temp1->next != NULL) {
+			int Id;
+			Id = temp1->ID;
+			cout << "\nProduct ID # " << temp1->ID << " is located at " << temp1 << " address in memory and occupies '" << count << "' position in the linked list.\n";
+			cout << "Deleting product record entirely as it is out of stock.\n";
+			node* previous = new node;
+			temp1 = start;
+
+			for (int i = temp1->ID; i < Id; i++) {
+				previous = temp1;
+				temp1 = temp1->next;
+			}
+			previous->next = temp1->next;
+			system("pause");
+			return;
+		}
+
+		temp1 = temp1->next;
+		count++;
+	}
+
+	cout << "\nNo such product(s) found in inventory that is out of stock.\n";
+	system("pause");
+
+	return;
+}
+void displayInventory() {
+
+
+	node* ptr = start;
+	if (ptr == NULL)
+	{
+		cout << "There is no element is the list" << endl;
+		system("pause");
+		return;
+	}
+	cout << "\nDisplaying details of all products stored in inventory:-\n\n";
+
+	while (ptr != NULL)
+	{
+		cout << "-------------------------------------------\n";
+		cout << "Product ID: " << ptr->ID << endl;
+		cout << "Product Name: " << ptr->name << endl;
+		cout << "Product Quantity: " << ptr->quantity << endl;
+		cout << "Product Per Unit Price (in PKR): " << ptr->unitCost << endl;
+		ptr = ptr->next;
+		cout << "\n-------------------------------------------\n";
+	}
+	cout << endl;
+	system("pause");
+	return;
+}
+
+void fileInventory() {
+
+	ofstream myfile3;
+	myfile3.open("Inventory.txt", ios::trunc);
+	node* ptr = start;
+	myfile3 << "\n-----------DETAILS OF INVENTORY STATE-----------\n\n";
+	while (ptr != NULL)
+	{
+		myfile3 << "-------------------------------------------\n";
+		myfile3 << "Product ID: " << ptr->ID << endl;
+		myfile3 << "Product Name: " << ptr->name << endl;
+		myfile3 << "Product Quantity: " << ptr->quantity << endl;
+		myfile3 << "Product Per Unit Price (in PKR): " << ptr->unitCost << endl;
+		myfile3 << "\n-------------------------------------------\n";
+		ptr = ptr->next;
+	}
+	myfile3.close();
+	cout << "\nData stored in inventory file successfully at back-end.\n" << endl;
+	system("pause");
+}
+
+void inventory() {
+
+	int ch, n;
+
+	do
+	{
+		system("cls");
+
+		cout << "=================================================\n";
+		cout << "          INVENTORY MANAGEMENT SUB-MENU          \n";
+		cout << "=================================================\n\n";
+		cout << "\t1. Add a product to inventory\n\t2. Update a product in inventory\n\t3. Remove a product from inventory (if out of stock)\n";
+		cout << "\t4. Display inventory\n\t5. Store inventory data to a text file\n\t6. Back to main menu\n\n";
+		cout << "=================================================\n\n";
+
+
+		cout << "Select an option: ";
+		cin >> ch;
+		cin.ignore();
+		cout << endl;
+		switch (ch)
+		{
+		case 1:
+			cout << "\nEnter number of products you want to feed data for: ";
+			cin >> n;
+			cin.ignore();
+			for (int i = 1; i <= n; i++)
+			{
+				insertItem();
+			}
+			break;
+
+		case 2:
+			cout << "\nEnter the Product's ID for updating: ";
+			cin >> n;
+			cin.ignore();
+			updateItem(n);
+			break;
+
+		case 3:
+			deleteItem();
+			break;
+
+		case 4:
+			displayInventory();
+
+
+			break;
+
+		case 5:
+			fileInventory(); // same function but for writing to a text file. 
+			break;
+
+		case 6:
+			break;
+
+		default:
+			cout << "ERROR: INVALID INPUT!\nPlease provide input (1 or 2 or 3...) as shown in menu.\n\n";
+			break;
+		}
+
+	} while (ch != 6);
+	cout << endl;
+}
+
+void addT() {
+
+	int iD, tno;
+	cout << "\nEnter ID of product being sold: "; cin >> iD;
+	cin.ignore();
+	double Bill;
+	int count = 0, check = 0, quan, check2;
+	string custName;
+	node* TEMP1 = start;
+	while (TEMP1 != NULL)
+	{
+		if (iD == TEMP1->ID && top == NULL && TEMP1->quantity != 0) {
+			customerNode* custTemp;
+			custTemp = new customerNode();
+			count++;
+			check = 0;
+			cout << "\nProduct ID # " << iD << " along with name '" << TEMP1->name << "' has been located\n";
+			cout << "\nEnter Customer transaction no. (Note: Unchangeable after entry so input carefully): ";
+			cin >> tno;
+			cin.ignore();
+			cout << "\nEnter Customer's Name: ";
+			getline(cin, custName);
+
+			cout << "\nEnter quantity of product being sold to customer: "; cin >> quan;
+			Bill = (TEMP1->unitCost) * quan;
+			TEMP1->quantity = (TEMP1->quantity - quan);
+			cout << "------------------------------------------------\n";
+			cout << "Amount charged for transaction (in PKR): " << fixed << setprecision(2) << Bill << endl;
+			cout << "------------------------------------------------\n";
+			cout << endl;
+			custTemp->transNo = tno;
+			custTemp->bill = Bill;
+			custTemp->name_.assign(custName);
+			custTemp->fwd = NULL;
+			top = custTemp;
+			break;
+		}
+
+		else if (iD == TEMP1->ID && top != NULL && TEMP1->quantity != 0) {
+			check = 0;
+			count++;
+			cout << "\nProduct ID # " << iD << " along with name '" << TEMP1->name << "' has been located\n";
+			cout << "\nEnter Customer transaction no. (Note: Unchangeable after entry so input carefully): ";
+			cin >> tno;
+			cin.ignore();
+			cout << "\nEnter Customer's Name: ";
+			getline(cin, custName);
+			cout << "\nEnter quantity of product being sold to customer: "; cin >> quan;
+			Bill = (TEMP1->unitCost) * quan;
+                                  TEMP1->quantity = (TEMP1->quantity - quan);
+			cout << "------------------------------------------------\n";
+			cout << "Amount charged for transaction (in PKR): " << fixed << setprecision(2) << Bill << endl;
+			cout << "------------------------------------------------\n";
+			cout << endl;
+			customerNode* Ptr, * custTempnode;
+			Ptr = top;
+			while (1)
+			{
+				if (Ptr->fwd != NULL)
+					Ptr = Ptr->fwd;
+				else
+					break;
+			}
+			custTempnode = new customerNode();
+			custTempnode->transNo = tno;
+			custTempnode->name_.assign(custName);
+			custTempnode->bill = Bill;
+			custTempnode->fwd = NULL;
+			Ptr->fwd = custTempnode;
+			break;
+		}
+		else {
+
+			if (TEMP1->quantity == 0 && TEMP1->next == NULL)
+			{
+				check2 = 1;
+				cout << "\nThe product is unfortunately out of stock. Sorry for convenience\n\n";
+				system("pause");
+				return;
+			}
+
+			check = 1;
+			count++;
+		}
+		TEMP1 = TEMP1->next;
+	}
+
+	if (check == 1) {
+
+		cout << "\nNo such product with ID # " << iD << " present in the inventory.\n";
+
+	}
+	cout << endl;
+	system("pause");
+	return;
+}
+
+void updateT(int tID) {
+
+	double BILL;
+	int count = 0, check;
+	double biLL;
+	string cName;
+	customerNode* ptrrr = top;
+	while (ptrrr != NULL)
+	{
+		if (tID == ptrrr->transNo) {
+			count++;
+			check = 0;
+			cout << "\nTransaction # '" << tID << "' is located at " << ptrrr << " address in memory and occupies '" << count << "' position in the customer transaction records.\n";
+			cout << "\nOld Customer Name: " << ptrrr->name_ << endl;
+			cout << "Change Customer name to (if u want to): ";
+			getline(cin, cName);
+
+			ptrrr->name_.assign(cName);
+			cout << "\nOriginal transaction bill: " << fixed << setprecision(2) << ptrrr->bill << endl;
+			cout << "Set new bill to (in PKR) (if necessary then only): "; cin >> biLL;
+			ptrrr->bill = biLL;
+
+			break;
+		}
+		else {
+			check = 1;
+			count++;
+		}
+		ptrrr = ptrrr->fwd;
+	}
+
+	if (check == 1) {
+
+		cout << "\nNo transaction having no. " << tID << " and such nature ever took place.\n";
+
+	}
+	cout << endl;
+	system("pause");
+	return;
+}
+
+void printTransactions() {
+
+	cout << "\nDisplaying details of all transactions taken place so far:-\n";
+	customerNode* ptr_ = top;
+	while (ptr_ != NULL)
+	{
+		cout << "\n-------------------------------------------\n";
+		cout << "Transaction No.: " << ptr_->transNo << endl;
+		cout << "Customer Name: " << ptr_->name_ << endl;
+		cout << "===========================================\n";
+		cout << "Amount Charged (in PKR): " << fixed << setprecision(2) << ptr_->bill << endl;
+		cout << "===========================================\n";
+		ptr_ = ptr_->fwd;
+		cout << "-------------------------------------------\n";
+	}
+	cout << endl;
+	system("pause");
+	return;
+}
+
+void fileTransactions() {
+
+	ofstream myfile2;
+	myfile2.open("Customers.txt", ios::trunc);
+	customerNode* ptr_ = top;
+	myfile2 << "--------------RECORD OF ALL TRANSACTIONS--------------\n";
+	while (ptr_ != NULL)
+	{
+		myfile2 << "-------------------------------------------\n";
+		myfile2 << "Transaction No.: " << ptr_->transNo << endl;
+		myfile2 << "Customer Name: " << ptr_->name_ << endl;
+		myfile2 << "========================================\n";
+		myfile2 << "Amount Charged (in PKR): " << fixed << setprecision(2) << ptr_->bill << endl;
+		myfile2 << "========================================\n";
+		myfile2 << "\n-------------------------------------------\n";
+		ptr_ = ptr_->fwd;
+	}
+	myfile2.close();
+	cout << "\nData for all transactions stored in customer file successfully at back-end.\n" << endl;
+	system("pause");
+	return;
+}
+
+void customer() {
+
+	int cho, N;
+	do
+	{
+		system("cls");
+		cout << "===============================================\n";
+		cout << "           CUSTOMER SERVICE SUB-MENU           \n";
+		cout << "===============================================\n\n";
+		cout << "\t1. Add a transaction\n\t2. Update a transaction\n";
+		cout << "\t3. Display all transactions\n\t4. Store transactions data to a text file\n\t5. Back to main menu\n\n";
+		cout << "===============================================\n\n";
+		cout << "Select an option: ";
+		cin >> cho;
+		cin.ignore();
+		cout << endl;
+		switch (cho)
+		{
+		case 1:
+			cout << "\nEnter number of transactions you want to feed data for: ";
+			cin >> N;
+			cin.ignore();
+			for (int i = 1; i <= N; i++)
+			{
+				addT();
+			}
+			system("pasue");
+			break;
+
+		case 2:
+			cout << "\nEnter Transaction No. of transaction that need updating: ";
+			cin >> N;
+			cin.ignore();
+			updateT(N);
+			break;
+
+		case 3:
+			printTransactions();
+			break;
+
+		case 4:
+			fileTransactions(); // almost same function but for writing to a text file.
+			break;
+
+		case 5:
+			break;
+
+		default:
+			cout << "ERROR: INVALID INPUT!\nPlease provide input (1 or 2 or 3...) as shown in menu.\n\n";
+			break;
+		}
+
+	} while (cho != 5);
+
+	cout << endl;
+}
+void fileFinances() {
+	int tra = 0, prod = 0, Quantity = 0;
+	double invenValue = 0, sales = 0;
+
+	customerNode* pTr_ = top;
+	while (pTr_ != NULL)
+	{
+		tra++;
+		sales = sales + pTr_->bill;
+		pTr_ = pTr_->fwd;
+	}
+
+	node* ptR_ = start;
+	while (ptR_ != NULL)
+	{
+		prod++;
+		Quantity = Quantity + ptR_->quantity;
+		invenValue = invenValue + (ptR_->quantity * ptR_->unitCost);
+		ptR_ = ptR_->next;
+
+	}
+
+	ofstream myfile;
+	myfile.open("Finances.txt", ios::trunc);
+	myfile << "\n=====================================================================================\n";
+	myfile << "\t  ---SUMMARY OF FINANCES FOR TODAY---  \t\n";
+	myfile << "\nTypes of products found of inventory: " << fixed << setprecision(2) << prod;
+	myfile << "\nNumber of transactions taken place so far: " << fixed << setprecision(2) << tra;
+	myfile << "\nQuantity of stock left in inventory: " << fixed << setprecision(2) << Quantity;
+	myfile << "\nCurrent net worth of stock held by the inventory of store (in PKR): " << fixed << setprecision(2) << invenValue;
+	myfile << "\nCurrent amount of net sales done by the store (in PKR): " << fixed << setprecision(2) << sales;
+	myfile << "\n======================================================================================\n";
+	myfile.close();
+	cout << "\nData regarding stores' finances stored in 'finances' file successfully at back-end.\n" << endl;
+	system("pause");
+}
+
+void finance() {
+
+	int tra = 0, prod = 0, Quantity = 0;
+	double invenValue = 0, sales = 0;
+
+	customerNode* pTr_ = top;
+	while (pTr_ != NULL)
+	{
+		tra++;
+		sales = sales + pTr_->bill;
+		pTr_ = pTr_->fwd;
+	}
+
+	node* ptR_ = start;
+	while (ptR_ != NULL)
+	{
+		prod++;
+		Quantity = Quantity + ptR_->quantity;
+		invenValue = invenValue + (ptR_->quantity * ptR_->unitCost);
+		ptR_ = ptR_->next;
+
+	}
+
+	cout << "\n=====================================================================================\n";
+	cout << "\t  ---SUMMARY OF FINANCES FOR TODAY---  \t\n";
+	cout << "\nTypes of products found in inventory: " << fixed << setprecision(2) << prod;
+	cout << "\nNumber of transactions taken place so far: " << fixed << setprecision(2) << tra;
+	cout << "\nQuantity of stock left in inventory: " << fixed << setprecision(2) << Quantity;
+	cout << "\nCurrent net worth of stock held by the inventory of store (in PKR): " << fixed << setprecision(2) << invenValue;
+	cout << "\nCurrent amount of net sales done by the store (in PKR): " << fixed << setprecision(2) << sales;
+	cout << "\n======================================================================================\n";
+	cout << endl;
+	int f;
+	cout << "Do you want to store the above financial data to a text file as well(Enter '0' for No OR '1' for Yes): ";
+	cin >> f;
+	system("pause");
+	cin.ignore();
+
+	if (f == 1)
+	{
+		fileFinances();	
+	}
+	else {
+		cout << "\n";
+	}
+}
+// Function that accepts the password
+
+bool takePasswdFromUser(char sp = '*')
+{
+	char ch;
+	string pass = "", pwd = "12345678";
+	int i, chance = 0;
+	do
+	{
+		ch = _getch();            // single character input without showing it on the screen
+		if (ch != 13)				//!= 13 beacuse of enter
+		{
+			pass += ch;
+			cout << "*";        // and intead of single character he is print *
+		}
+
+	} while (ch != 13);
+
+	if (pass == pwd)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+
+int main() {
+
+	int choice;
+	bool bypass = false;
+
+	do
+	{
+		cout << "\n================================================\n";
+		cout << "     DEPARTMENTAL STORE MANAGEMENT SYSTEM    \n";
+		cout << "================================================\n\n";
+		bool pwd;
+		cout << "\t   ADMINISTRATOR LOGIN\t\n";
+		cout << "\n------------------------------------------------\n";
+
+		cout << "\nEnter login password: ";
+
+		// Function call
+		pwd = takePasswdFromUser();
+		cout << endl;
+
+		if (pwd == true)
+		{
+			cout << "\n------------------------------------------------\n";
+			bypass = true;
+			cout << "\n\t   **ACCESS GRANTED**\t\n\nSwitching to control main menu....\n\n";
+			system("pause");
+
+		}
+		else {
+			cout << "\n\t**ACCESS DENIED**\t\n\nPlease re-enter the correct password.\n";
+			system("pause");
+
+		}
+
+	} while (bypass != true);
+
+	do {
+		system("cls");
+		cout << "==============================================\n";     // Interactive & user-friendly control menu for our Store Management System
+		cout << "          STORE CONTROL MAIN MENU             \n";
+		cout << "==============================================\n\n";
+		cout << "\t1. INVENTORY MANAGEMENT\n\t2. CUSTOMER SERVICE \n\t3. CHECK FINANCES OF STORE\n\t4. CLOSE MENU AND QUIT\n\n";
+		cout << "==============================================\n\n";
+		cout << "SELECT AN OPTION FROM MENU: ";
+		cin >> choice;
+		cin.ignore();
+		switch (choice)
+		{
+		case 1:
+			system("cls");
+			inventory();
+			cout << "==============================================\n\n";
+			break;
+		case 2:
+			system("cls");
+			customer();
+			cout << "==============================================\n\n";
+			break;
+
+		case 3:
+			system("cls");
+			finance();
+			cout << "==============================================\n\n";
+			break;
+		case 4:
+			break;
+
+		default:
+			cout << "ERROR: INVALID INPUT!\nPlease provide input (like 1 or 2 or 3...) as shown in menu.\n\n";
+			break;
+		}
+
+	} while (choice != 4);
+
+	cout << endl;
+	system("pause");
+	return 0;
+}
